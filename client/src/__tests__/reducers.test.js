@@ -133,6 +133,7 @@ test('CLEAR_CART', () => {
   expect(initialState.cart.length).toBe(2);
 });
 
+// expect cartOpen to be the opposite of its previous value each time TOGGLE_CART is called
 test('TOGGLE_CART', () => {
   let newState = reducer(initialState, {
     type: TOGGLE_CART
