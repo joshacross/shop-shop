@@ -5,21 +5,43 @@ import { useQuery } from '@apollo/client';
 import { QUERY_PRODUCTS } from '../utils/queries';
 import spinner from '../assets/spinner.gif';
 import Cart from '../components/Cart';
+import { useStoreContext } from "../utils/GlobalState";
+import {
+  REMOVE_FROM_CART,
+  UPDATE_CART_QUANTITY,
+  ADD_TO_CART,
+  UPDATE_PRODUCTS,
+} from '../utils/actions';
+
 
 function Detail() {
+
+  const [state, dispatch] = useStoreContext();
   const { id } = useParams();
 
-  const [currentProduct, setCurrentProduct] = useState({});
+  const [currentProduct, setCurrentProduct] = useState({})
 
   const { loading, data } = useQuery(QUERY_PRODUCTS);
 
-  const products = data?.products || [];
+  const { products } = state;
 
   useEffect(() => {
     if (products.length) {
-      setCurrentProduct(products.find((product) => product._id === id));
+      setCurrentProduct(products.find(product => product._id === id));
+    } else if (data) {
+      dispatch({
+        type: UPDATE_PRODUCTS,
+        products: data.products
+      });
     }
-  }, [products, id]);
+  }, [products, data, dispatch, id]);
+
+  const addToCart = () => {
+    dispatch({
+      type: ADD_TO_CART,
+      product: { ...currentProduct, purchaseQuantity: 1 }
+    });
+  };
 
   return (
     <>
@@ -33,7 +55,7 @@ function Detail() {
 
           <p>
             <strong>Price:</strong>${currentProduct.price}{' '}
-            <button>Add to Cart</button>
+            <button onClick={addToCart}>Add to Cart</button>
             <button>Remove from Cart</button>
           </p>
 

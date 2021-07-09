@@ -1,29 +1,45 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 
 import ProductItem from '../ProductItem';
 import { QUERY_PRODUCTS } from '../../utils/queries';
 import spinner from '../../assets/spinner.gif';
+import { useStoreContext } from '../../utils/GlobalState';
+import { UPDATE_PRODUCTS } from '../../utils/actions';
 
-function ProductList({ currentCategory }) {
+function ProductList() {
+  // execute useStoreContext to retrieve global state object and dispatch to update
+  const [state, dispatch] = useStoreContext();
+  // destructure currentCategory out of the state object to use it in filterproducts func
+  const { currentCategory } = state;
+  // useEffect hook to wait for our useQuery to come in
   const { loading, data } = useQuery(QUERY_PRODUCTS);
-
-  const products = data?.products || [];
-
+  
+  useEffect(() => {
+      // once useQuery data comes in, it goes from undefined to having value
+    if (data) {
+      // instruct reducer that it's the UPDATE_PRODUCTS action
+      // should have an array of product data to our global store
+      dispatch({
+        type: UPDATE_PRODUCTS,
+        products: data.products
+      });
+    }
+    // useStoreContext() executes again giving us the product data needed to display products on the page
+  }, [data, dispatch]);
+  
   function filterProducts() {
     if (!currentCategory) {
-      return products;
+      return state.products;
     }
-
-    return products.filter(
-      (product) => product.category._id === currentCategory
-    );
+  
+    return state.products.filter(product => product.category._id === currentCategory);
   }
 
   return (
     <div className="my-2">
       <h2>Our Products:</h2>
-      {products.length ? (
+      {state.products.length ? (
         <div className="flex-row">
           {filterProducts().map((product) => (
             <ProductItem
