@@ -13,7 +13,9 @@ const CartItem = ({ item }) => {
       _id: item._id
     });
   };
-
+  // allow users to manually edit the quantity of shopping cart items
+  // anytime an <input> element's value changes, an onChange event will occur
+  // capture that event and send the element's new value to the reducer
   const onChange = (e) => {
     const value = e.target.value;
   
