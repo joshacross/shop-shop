@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-
 import ProductItem from '../ProductItem';
 import { QUERY_PRODUCTS } from '../../utils/queries';
 import spinner from '../../assets/spinner.gif';
 import { useStoreContext } from '../../utils/GlobalState';
 import { UPDATE_PRODUCTS } from '../../utils/actions';
+import { idbPromise } from '../../utils/helpers';
 
 function ProductList() {
   // execute useStoreContext to retrieve global state object and dispatch to update
@@ -24,9 +24,23 @@ function ProductList() {
         type: UPDATE_PRODUCTS,
         products: data.products
       });
+
+      // take each product and save it to IDB using helper
+      data.products.forEach((product) => {
+        idbPromise('products', 'put', product);
+      });
+    } else if (!loading) {
+      // offline - get all data from products store
+      idbPromise('products', 'get').then((products) => {
+        // set global state with retrieved data for offline browsing
+        dispatch({
+          type: UPDATE_PRODUCTS,
+          products: products
+        });
+      });
     }
     // useStoreContext() executes again giving us the product data needed to display products on the page
-  }, [data, dispatch]);
+  }, [data, loading, dispatch]);
   
   function filterProducts() {
     if (!currentCategory) {
