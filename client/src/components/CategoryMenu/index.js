@@ -31,6 +31,9 @@ function CategoryMenu({ setCategory }) {
           type: UPDATE_CATEGORIES,
           categories: categories
         });
+      })
+      .catch((error) => {
+        console.error(error);
       });
     }
 

@@ -49,6 +49,9 @@ useEffect(() => {
         type: UPDATE_PRODUCTS,
         products: indexedProducts
       });
+    })
+    .catch((error) => {
+      console.error(error);
     });
   }
 }, [products, data, loading, dispatch, id]);

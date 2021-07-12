@@ -37,6 +37,9 @@ function ProductList() {
           type: UPDATE_PRODUCTS,
           products: products
         });
+      })
+      .catch((error) => {
+        console.error(error);
       });
     }
     // useStoreContext() executes again giving us the product data needed to display products on the page
